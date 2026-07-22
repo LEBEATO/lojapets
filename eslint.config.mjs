@@ -1,7 +1,7 @@
 import { FlatCompat } from '@eslint/eslintrc';
 
 const compat = new FlatCompat({
-  baseDirectory: import.meta.dirname, // ✅ uso correto em ES Modules
+  baseDirectory: import.meta.dirname,
 });
 
 const eslintConfig = [
