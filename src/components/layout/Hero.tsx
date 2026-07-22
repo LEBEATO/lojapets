@@ -17,7 +17,10 @@ export default function Hero() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+      transition: { 
+        duration: 0.8, 
+        ease: [0.16, 1, 0.3, 1] as any // ✅ CORREÇÃO: usando "as any" para evitar erro de tipo
+      },
     },
   };
 
