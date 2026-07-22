@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     if (products && products.length > 0) {
       productUrls = products.map((product) => ({
-        url: ${baseUrl}/produtos/${product.id},
+        url: `${baseUrl}/produtos/${product.id}`,
         lastModified: product.updated_at || new Date(),
         changeFrequency: 'weekly' as const,
         priority: 0.8,
@@ -31,16 +31,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-      url: ${baseUrl}/produtos,
+      url:` ${baseUrl}/produtos,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9,
+      priority: 0.9,`
     },
     {
-      url: ${baseUrl}/promocoes,
+      url: `${baseUrl}/promocoes,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.7,
+      priority: 0.7,`
     },
     ...productUrls,
   ];
