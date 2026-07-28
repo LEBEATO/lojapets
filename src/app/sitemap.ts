@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '../lib/supabase-server'; 
+import { createClient } from '@/utils/supabase/server'; 
 
 // Garante que a rota não seja pré-renderizada estaticamente sem as variáveis de ambiente no build
 export const dynamic = 'force-dynamic';
