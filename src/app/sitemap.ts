@@ -1,14 +1,29 @@
 import { MetadataRoute } from 'next';
-import { createClient } from '@/utils/supabase/server'; 
-
-// Garante que a rota não seja pré-renderizada estaticamente sem as variáveis de ambiente no build
-export const dynamic = 'force-dynamic';
+import { createServerSupabase } from '@/lib/supabase-server';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://seu-dominio.com.br';
 
-  // Páginas estáticas principais
-  const staticRoutes: MetadataRoute.Sitemap = [
+  let productUrls: MetadataRoute.Sitemap = [];
+try {
+const supabase = await createServerSupabase();
+const { data: products } = await supabase
+.from('products')
+.select('id, updated_at');
+
+    if (products && products.length > 0) {
+      productUrls = products.map((product) => ({
+        url: `${baseUrl}/produtos/${product.id}`,
+        lastModified: product.updated_at || new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
+      }));
+    }
+} catch (error) {
+    console.error('Erro ao buscar produtos para o sitemap:', error);
+}
+
+  return [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -16,31 +31,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 1.0,
     },
     {
-  url:`${baseUrl}/produtos`,
+      url:` ${baseUrl}/produtos,
       lastModified: new Date(),
       changeFrequency: 'daily',
-      priority: 0.9,
+      priority: 0.9,`
     },
-  ];
-
-  try {
-    // Inicialização segura do Supabase para buscar produtos dinamicamente
-    const supabase = await createClient();
-    const { data: produtos } = await supabase
-      .from('produtos')
-      .select('slug, updated_at');
-
-    const productRoutes: MetadataRoute.Sitemap = (produtos || []).map((produto) => ({
-      url: `${baseUrl}/produtos/${produto.slug}`,
-      lastModified: produto.updated_at ? new Date(produto.updated_at) : new Date(),
+    {
+      url: `${baseUrl}/promocoes,
+      lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.8,
-    }));
-
-    return [...staticRoutes, ...productRoutes];
-  } catch (error) {
-    console.error('Erro ao gerar sitemap dinâmico:', error);
-    // Retorna ao menos as rotas estáticas caso haja algum problema na busca
-    return staticRoutes;
-  }
+      priority: 0.7,`
+    },
+    ...productUrls,
+  ];
 }
