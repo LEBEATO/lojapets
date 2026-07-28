@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useCart } from "@/hooks/useCart";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
@@ -25,20 +25,21 @@ export default function Navbar() {
   const { cartCount, setIsCartOpen } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const menuRef = useOutsideClick(() => {
+  const closeMenus = useCallback(() => {
     setMenuOpen(false);
     setMobileMenuOpen(false);
-  });
+  }, []);
+  const menuRef = useOutsideClick(closeMenus);
 
   return (
-    <nav className="w-full h-14 sm:h-16 bg-white border-b border-slate-100 fixed top-0 left-0 z-50 px-3 sm:px-6 lg:px-8 flex items-center justify-center">
+    <nav ref={menuRef} className="w-full h-14 sm:h-16 bg-white border-b border-slate-100 fixed top-0 left-0 z-50 px-3 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="max-w-7xl w-full flex items-center justify-between">
         
         <Link href="/" className="text-lg sm:text-xl font-black text-emerald-600 tracking-tight flex items-center gap-1">
           🐾 PET<span className="text-slate-800">LOJA</span>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-4" ref={menuRef}>
+        <div className="flex items-center gap-2 sm:gap-4">
           
           {/* Menu Desktop */}
           <div className="hidden md:block relative">
