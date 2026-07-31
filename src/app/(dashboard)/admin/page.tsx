@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { supabase } from "@/lib/supabase";
 import { HiOutlineCloudUpload, HiOutlineTrash } from "react-icons/hi";
 import { FiLogOut } from "react-icons/fi";
 import { Product } from "@/types";
@@ -108,7 +107,7 @@ export default function AdminPanel() {
       sizes: sizesString ? sizesString.split(",").map(s => s.trim()).filter(Boolean) : [],
     };
 
-    const { data, error } = await productService.create(productData, imageFile);
+    const { error } = await productService.create(productData, imageFile);
 
     setLoading(false);
 

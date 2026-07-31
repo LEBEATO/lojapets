@@ -41,14 +41,14 @@ export default function CartSidebar() {
       {/* Fundo escurecido */}
       <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)} />
 
-      {/* Sidebar do Carrinho */}
-      <div className="absolute inset-y-0 right-0 flex w-full max-w-[92vw] sm:max-w-md">
-        <div className="flex-1 bg-white shadow-xl flex flex-col rounded-l-2xl sm:rounded-l-none overflow-hidden">
+      {/* Sidebar do Carrinho — mais estreito no mobile */}
+      <div className="absolute inset-y-3 right-3 sm:inset-y-0 sm:right-0 flex w-[min(280px,calc(100vw-1.5rem))] sm:w-full sm:max-w-md">
+        <div className="flex-1 bg-white shadow-xl flex flex-col rounded-2xl sm:rounded-none overflow-hidden">
           
           {/* Cabeçalho - Reduzido */}
-          <div className="flex-shrink-0 px-3 py-2.5 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-sm sm:text-lg font-black text-slate-800 flex items-center gap-1.5">
-              <HiOutlineShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" /> 
+          <div className="flex-shrink-0 px-2.5 py-2 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="text-xs sm:text-lg font-black text-slate-800 flex items-center gap-1 sm:gap-1.5">
+              <HiOutlineShoppingBag className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600" /> 
               <span>Carrinho</span>
               {cart.length > 0 && (
                 <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
@@ -66,16 +66,15 @@ export default function CartSidebar() {
           </div>
 
           {/* Listagem de Itens - Compacta */}
-          <div className="flex-1 overflow-y-auto p-2.5 sm:p-6 space-y-2 sm:space-y-4">
+          <div className="flex-1 overflow-y-auto p-2 sm:p-6 space-y-1.5 sm:space-y-4">
             {cart.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 text-sm font-medium">
+              <div className="text-center py-8 sm:py-12 text-slate-400 text-xs sm:text-sm font-medium">
                 Seu carrinho está vazio.
               </div>
             ) : (
               cart.map((item) => (
-                <div key={item.id} className="flex items-center gap-2.5 bg-slate-50 p-2 rounded-xl border border-slate-100">
-                  {/* Imagem - Menor */}
-                  <div className="w-10 h-10 sm:w-16 sm:h-16 bg-white rounded-lg relative overflow-hidden flex-shrink-0 p-0.5 border border-slate-100">
+                <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-slate-100">
+                  <div className="w-9 h-9 sm:w-16 sm:h-16 bg-white rounded-md sm:rounded-lg relative overflow-hidden flex-shrink-0 p-0.5 border border-slate-100">
                     <Image src={item.image_url} alt={item.name} fill className="object-contain p-0.5" />
                   </div>
 
@@ -122,19 +121,19 @@ export default function CartSidebar() {
 
           {/* Rodapé - Compacto */}
           {cart.length > 0 && (
-            <div className="flex-shrink-0 px-3 py-2.5 sm:px-6 sm:py-4 border-t border-slate-100 space-y-2 bg-white">
+            <div className="flex-shrink-0 px-2.5 py-2 sm:px-6 sm:py-4 border-t border-slate-100 space-y-1.5 sm:space-y-2 bg-white">
               <div className="flex items-center justify-between text-slate-800 font-bold">
-                <span className="text-xs sm:text-sm">Total:</span>
-                <span className="text-base sm:text-xl font-black text-slate-950">
+                <span className="text-[11px] sm:text-sm">Total:</span>
+                <span className="text-sm sm:text-xl font-black text-slate-950">
                   {formatPrice(cartTotal)}
                 </span>
               </div>
               
               <button
                 onClick={handleWhatsAppCheckout}
-                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold py-2 px-3 rounded-xl transition-colors duration-200 text-xs sm:text-sm shadow-sm active:scale-95"
+                className="w-full flex items-center justify-center gap-1.5 sm:gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-lg sm:rounded-xl transition-colors duration-200 text-[11px] sm:text-sm shadow-sm active:scale-95"
               >
-                <FaWhatsapp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <FaWhatsapp className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span>Finalizar no WhatsApp</span>
               </button>
             </div>

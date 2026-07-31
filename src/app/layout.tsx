@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: SITE_NAME,
-    template: `%s | ${SITE_NAME}`,
+    template: %s | ${SITE_NAME},
   },
   description: SITE_DESCRIPTION,
   keywords: ['pet shop', 'ração', 'brinquedos', 'acessórios', 'pet'],
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/link.jpg', 
+        url: '/banner-v2.jpg', // <--- Foto da loja (coloque em public/banner-v2.jpg)
         width: 1200,
         height: 630,
         alt: SITE_NAME,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ['/link.jpg'], 
+    images: ['/banner-v2.jpg'], // <--- Foto da loja para Twitter/X
   },
 };
 

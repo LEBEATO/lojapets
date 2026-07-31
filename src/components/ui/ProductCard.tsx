@@ -11,7 +11,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, addToCart }: ProductCardProps) {
   return (
-    <div className="relative flex h-auto min-h-[340px] w-full flex-col rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm hover:shadow-md transition-all group">
+    <div className="relative flex h-auto min-h-[240px] w-full flex-col rounded-2xl border border-slate-100 bg-white p-2.5 shadow-sm hover:shadow-md transition-all group">
       {/* Badge de desconto */}
       {product.discount_badge && (
         <span className="absolute left-2 top-2 z-10 rounded-lg bg-amber-400 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-900">
@@ -36,7 +36,7 @@ export default function ProductCard({ product, addToCart }: ProductCardProps) {
 
       {/* Informações */}
       <div className="flex flex-1 flex-col">
-        <h3 className="line-clamp-1 text-xs font-bold uppercase tracking-tight text-slate-900">
+        <h3 className="line-clamp-1 text-xs pt-1 font-bold uppercase tracking-tight text-slate-900">
           {product.name}
         </h3>
         <p className="mt-0.5 min-h-[24px] line-clamp-2 text-[10px] text-slate-400 leading-snug">

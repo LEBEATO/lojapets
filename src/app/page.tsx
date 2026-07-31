@@ -3,6 +3,9 @@ import PromoCarousel from "@/components/ui/PromoCarousel";
 import ProductGridClient from "@/components/ui/ProductGridClient";
 import { productService } from "@/services/productService";
 
+// 🔄 Desativa o cache estático para sempre buscar dados frescos
+export const revalidate = 0;
+
 export default async function Home() {
   const { data: produtos } = await productService.getAll();
 
