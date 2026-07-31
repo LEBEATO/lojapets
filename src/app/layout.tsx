@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: SITE_NAME,
-    template: %s | ${SITE_NAME},
+    template:`%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   keywords: ['pet shop', 'ração', 'brinquedos', 'acessórios', 'pet'],
