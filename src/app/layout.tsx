@@ -14,13 +14,18 @@ const inter = Inter({
   variable: '--font-inter',
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://seu-dominio.com.br";
+// Detecta a URL do projeto dinamicamente para a Vercel não travar no preview
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "https://lojapets-lebeatos-projects.vercel.app";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(baseUrl),
   title: {
     default: SITE_NAME,
-    template:`%s | ${SITE_NAME}`,
+    template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
   keywords: ['pet shop', 'ração', 'brinquedos', 'acessórios', 'pet'],
@@ -32,13 +37,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    url: siteUrl,
+    url: baseUrl,
     siteName: SITE_NAME,
     locale: 'pt_BR',
     type: 'website',
     images: [
       {
-        url: '/link.jpg', // <--- Foto da loja (coloque em public/banner-v2.jpg)
+        url: '/loja.jpg', // <--- Foto da sua loja na pasta /public
         width: 1200,
         height: 630,
         alt: SITE_NAME,
@@ -49,7 +54,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ['/banner-v2.jpg'], // <--- Foto da loja para Twitter/X
+    images: ['/link.jpg'],
   },
 };
 
