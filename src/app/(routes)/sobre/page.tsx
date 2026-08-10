@@ -22,7 +22,7 @@ export default function SobrePage() {
 
       <div className="w-full h-[250px] sm:h-[350px] relative rounded-3xl overflow-hidden mb-12 shadow-sm border border-slate-100">
         <Image 
-          src="/lojapet.jpg" 
+          src="/loja.jpg" 
           alt="Fachada da PetLoja"
           fill
           priority
