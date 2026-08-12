@@ -9,8 +9,8 @@ const HERO_IMAGES = [
   "/pet1.jpg",
   "/pet2.jpg",
   "/pet3.jpg",
-   "/pet4.jpg",
-    "/pet5.jpg",
+  "/pet4.jpg",
+  "/pet5.jpg",
 ];
 
 export default function Hero() {
@@ -32,7 +32,6 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
 
-
   const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
   const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
 
@@ -49,16 +48,15 @@ export default function Hero() {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
     },
   };
 
   return (
     <section ref={containerRef} className="w-full bg-white pb-4 md:pb-8">
-     
       <div className="w-full overflow-hidden flex flex-col items-center justify-center md:justify-end pb-8 md:pb-12 min-h-[420px] h-[60vh] sm:h-[65vh] md:h-[75vh] text-center px-4 sm:px-6 relative shadow-lg">
 
-        {/* Container da Imagem */}
+        {/* Container da Imagem com Animação Parallax */}
         <motion.div
           style={{ y: imageY, scale: imageScale }}
           className="absolute inset-0 w-full h-full z-0"
@@ -70,21 +68,21 @@ export default function Hero() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1, ease: "easeInOut" }}
-              className="object-cover object-[center_25%]"sizer="100vw"
+              className="absolute inset-0"
             >
               <Image
                 src={HERO_IMAGES[currentImageIndex]}
                 alt="Banner Pet Shop"
                 fill
+                sizes="100vw"
                 priority={currentImageIndex === 0}
                 className="object-cover object-[center_25%]"
-                
               />
             </motion.div>
           </AnimatePresence>
         </motion.div>
 
-        {/* Overlay com leve escurecimento extra no mobile para melhorar contraste */}
+        {/* Overlay com gradiente */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30 z-10 pointer-events-none" />
 
         {/* Conteúdo textual centralizado */}
@@ -107,11 +105,12 @@ export default function Hero() {
             className="text-slate-100 mt-3 sm:mt-5 text-sm sm:text-base md:text-xl font-medium max-w-xl md:max-w-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2"
           >
             Explore nossa seleção exclusiva de rações, brinquedos e acessórios direto do nosso catálogo dinâmico.
-          </motion.p><motion.div variants={textVariants} className="mt-6 sm:mt-8">
+          </motion.p>
+
+          <motion.div variants={textVariants} className="mt-6 sm:mt-8">
             <Link
               href="#catalogo"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base py-3 px-6 sm:py-3.5 sm:px-8 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 duration-200 inline-block"
-            >
+              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base py-3 px-6 sm:py-3.5 sm:px-8 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 duration-200 inline-block">
               Ver Catálogo Completo 🐾
             </Link>
           </motion.div>
