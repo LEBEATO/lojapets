@@ -19,6 +19,11 @@ const HERO_IMAGES = [
   "/pet5.jpg",
 ];
 
+const HERO_TITLE_LINES = [
+  "Tudo que seu Pet precisa,",
+  "com a entrega que ele merece!",
+];
+
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -60,6 +65,41 @@ export default function Hero() {
       filter: "blur(0px)",
       transition: {
         duration: reduceMotion ? 0.01 : 0.72,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
+    },
+  };
+
+  const titleVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        delayChildren: reduceMotion ? 0 : 0.22,
+        staggerChildren: reduceMotion ? 0 : 0.026,
+      },
+    },
+  };
+
+  const letterVariants = {
+    hidden: reduceMotion
+      ? { opacity: 1 }
+      : {
+          opacity: 0,
+          y: 18,
+          scale: 0.96,
+          filter: "blur(7px)",
+          color: "rgb(52 211 153)",
+          textShadow: "0 0 18px rgba(52, 211, 153, 0.65)",
+        },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      filter: "blur(0px)",
+      color: "rgb(255 255 255)",
+      textShadow: "0 2px 8px rgba(0, 0, 0, 0.45)",
+      transition: {
+        duration: reduceMotion ? 0.01 : 0.48,
         ease: [0.16, 1, 0.3, 1] as const,
       },
     },
@@ -113,86 +153,38 @@ export default function Hero() {
             🐾
           </motion.span>
 
-          <motion.div
-            variants={textVariants}
-            className="relative w-full max-w-[820px] px-5 py-5 sm:px-8 sm:py-6 md:px-12 md:py-8"
+          <motion.h1
+            variants={titleVariants}
+            initial="hidden"
+            animate="visible"
+            aria-label="Tudo que seu Pet precisa, com a entrega que ele merece!"
+            className="px-2 text-2xl font-black leading-tight tracking-tight text-white sm:text-3xl md:text-5xl"
           >
-            <svg
-              aria-hidden="true"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-            >
-              <defs>
-                <filter id="hero-frame-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.2" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
+            {HERO_TITLE_LINES.map((line, lineIndex) => (
+              <span
+                key={line}
+                aria-hidden="true"
+                className={lineIndex === 1 ? "block md:mt-1" : "block"}
+              >
+                {Array.from(line).map((letter, letterIndex) => (
+                  <motion.span
+                    key={`${lineIndex}-${letterIndex}`}
+                    variants={letterVariants}
+                    className="inline-block will-change-transform"
+                  >
+                    {letter === " " ? "\u00A0" : letter}
+                  </motion.span>
+                ))}
+              </span>
+            ))}
+          </motion.h1>
 
-              <motion.path
-                d="M 12 7 L 88 7 L 98 93 L 2 93 Z"
-                fill="none"
-                stroke="rgb(52 211 153)"
-                strokeWidth="1.3"
-                vectorEffect="non-scaling-stroke"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                filter="url(#hero-frame-glow)"
-                initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
-                animate={{ pathLength: 1, opacity: 0.92 }}
-                transition={{
-                  pathLength: {
-                    duration: reduceMotion ? 0.01 : 1.45,
-                    delay: reduceMotion ? 0 : 0.42,
-                    ease: [0.16, 1, 0.3, 1],
-                  },
-                  opacity: {
-                    duration: reduceMotion ? 0.01 : 0.35,
-                    delay: reduceMotion ? 0 : 0.34,
-                  },
-                }}
-              />
-
-              {!reduceMotion && (
-                <motion.path
-                  d="M 12 7 L 88 7 L 98 93 L 2 93 Z"
-                  fill="none"
-                  stroke="rgb(110 231 183)"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: [0, 0.18, 0.34, 0.18] }}
-                  transition={{
-                    duration: 4.8,
-                    delay: 1.75,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-              )}
-            </svg>
-
-            <motion.h1
-              variants={textVariants}
-              className="relative z-10 px-2 text-2xl font-black leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-3xl md:text-5xl"
-            >
-              Tudo que seu Pet precisa, <br className="hidden md:block" />
-              com a entrega que ele merece!
-            </motion.h1>
-
-            <motion.p
-              variants={textVariants}
-              className="relative z-10 mt-3 px-2 text-sm font-medium text-slate-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:mt-5 sm:text-base md:text-xl"
-            >
-              Explore nossa seleção exclusiva de rações, brinquedos e acessórios direto do nosso catálogo dinâmico.
-            </motion.p>
-          </motion.div>
+          <motion.p
+            variants={textVariants}
+            className="mt-3 max-w-2xl px-2 text-sm font-medium text-slate-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:mt-5 sm:text-base md:text-xl"
+          >
+            Explore nossa seleção exclusiva de rações, brinquedos e acessórios direto do nosso catálogo dinâmico.
+          </motion.p>
 
           <motion.div variants={textVariants} className="mt-6 sm:mt-8">
             <motion.div
