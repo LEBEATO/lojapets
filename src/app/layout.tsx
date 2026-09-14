@@ -5,6 +5,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CartSidebar from "@/components/cart/CartSidebar";
+import PetAssistant from "@/components/assistant/PetAssistant";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/config/constants";
 import "./globals.css";
 
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: '/loja.jpg', // <--- Foto da sua loja na pasta /public
+        url: '/loja.jpg',
         width: 1200,
         height: 630,
         alt: SITE_NAME,
@@ -66,7 +67,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={inter.variable}>
       <body className="antialiased bg-slate-50">
-        <ToastProvider>      
+        <ToastProvider>
           <CartProvider>
             <Navbar />
             <main className="pt-16 min-h-screen">
@@ -74,6 +75,7 @@ export default function RootLayout({
             </main>
             <Footer />
             <CartSidebar />
+            <PetAssistant />
           </CartProvider>
         </ToastProvider>
       </body>
