@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Check, ShoppingBag } from "lucide-react";
 import { Product } from "@/types";
@@ -21,6 +21,12 @@ export default function ProductCard({ product, addToCart }: ProductCardProps) {
   const reduceMotion = useReducedMotion();
   const { showToast } = useToast();
 
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
+
   const handleAddToCart = () => {
     if (product.image_url) {
       flyProductToCart(product.image_url, imageContainerRef.current);
@@ -33,7 +39,10 @@ export default function ProductCard({ product, addToCart }: ProductCardProps) {
     showToast("success", "Adicionado ao carrinho", product.name, 2400);
 
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setAdded(false), 1250);
+    resetTimerRef.current = setTimeout(() => {
+      setAdded(false);
+      resetTimerRef.current = null;
+    }, 1250);
   };
 
   return (
