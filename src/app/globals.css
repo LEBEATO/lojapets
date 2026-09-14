@@ -1,57 +1,73 @@
 @import "tailwindcss";
 
 @theme {
-  --animate-infinite-scroll: infinite-scroll 20s linear infinite;
-
-  @keyframes infinite-scroll {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
-    @theme {
-  --animate-infinite-scroll: infinite-scroll 15s linear infinite; /* ✅ 15s equilibrado */
+  --animate-infinite-scroll: infinite-scroll 22s linear infinite;
 }
+
+@keyframes infinite-scroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
-/* Scrollbar personalizada */
-::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+html {
+  scroll-behavior: smooth;
 }
 
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar personalizada */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f8fafc;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
+  background: #f8fafc;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
+  background: #94a3b8;
+  border: 2px solid #f8fafc;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #64748b;
 }
 
 @layer utilities {
   .text-shadow-sm {
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
-  
+
   .text-shadow-md {
     text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-  
+
   .text-shadow-lg {
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 }
 
-/* Ajustes para mobile */
+@media (max-width: 640px) {
+  .animate-infinite-scroll {
+    animation-duration: 28s;
+  }
+}
+
 @media (max-width: 480px) {
   .container {
     padding-left: 12px;
@@ -59,9 +75,27 @@
   }
 }
 
-/* Touch feedback para mobile */
 @media (hover: none) {
   .hover\:scale-105:hover {
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .animate-infinite-scroll {
+    animation: none !important;
   }
 }

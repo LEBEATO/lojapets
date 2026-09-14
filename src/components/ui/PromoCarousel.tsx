@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { motion, useReducedMotion } from "framer-motion";
 import { productService } from "@/services/productService";
 import { Product } from "@/types";
 
 export default function PromoCarousel() {
   const [promos, setPromos] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     async function fetchPromotions() {
@@ -16,103 +18,117 @@ export default function PromoCarousel() {
       setPromos(data || []);
       setLoading(false);
     }
+
     fetchPromotions();
   }, []);
 
   if (loading) {
     return (
-      <div className="w-full bg-slate-50/50 pt-6 pb-4">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="h-6 w-32 bg-slate-200 rounded-lg animate-pulse mb-4" />
+      <div className="w-full bg-slate-50/50 pb-4 pt-6">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-4 h-6 w-32 animate-pulse rounded-lg bg-slate-200" />
           <div className="flex gap-4 overflow-hidden">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex-none w-[280px] sm:w-[340px] h-[160px] bg-slate-200 rounded-2xl animate-pulse" />
+              <div key={i} className="h-[160px] w-[280px] flex-none animate-pulse rounded-2xl bg-slate-200 sm:w-[340px]" />
             ))}
           </div>
         </div>
       </div>
     );
   }
-  
+
   if (promos.length === 0) return null;
 
   const renderCard = (promo: Product, index: number) => {
-    const discountParts = promo.discount_badge ? promo.discount_badge.split(' ') : ["% off"];
-    // ✅ CORRIGIDO: template string com crases
-    const destinoLink = promo.category_slug 
+    const discountParts = promo.discount_badge ? promo.discount_badge.split(" ") : ["% off"];
+    const destinoLink = promo.category_slug
       ? `/produtos/categoria/${promo.category_slug}`
       : "/#catalogo";
 
     return (
-      <Link
-        // ✅ CORRIGIDO: template string com crases
+      <motion.div
         key={`${promo.id}-${index}`}
-        href={destinoLink}
-        className="flex-none w-[280px] sm:w-[340px] md:w-[400px] h-[160px] sm:h-[180px] md:h-[200px] rounded-2xl md:rounded-[2rem] bg-[#f4f8f0] flex relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-slate-100/40"
+        whileHover={reduceMotion ? undefined : { y: -5 }}
+        transition={{ type: "spring", stiffness: 320, damping: 26 }}
+        className="h-[160px] w-[280px] flex-none sm:h-[180px] sm:w-[340px] md:h-[200px] md:w-[400px]"
       >
-        <div className="w-[40%] sm:w-[45%] h-full relative flex items-center justify-center overflow-hidden bg-[#b2e633]/10">
-          <div className="absolute -left-20 -top-20 w-48 sm:w-64 h-48 sm:h-64 rounded-full bg-[#b2e633] opacity-90" />
-          <div className="absolute -left-10 -bottom-16 w-36 sm:w-44 h-36 sm:h-44 rounded-full bg-[#b2e633] opacity-95" />
-          
-          <div className="relative z-10 w-full h-full p-3 sm:p-4 flex items-center justify-center drop-shadow-md">
-            {promo.image_url ? (
-              <Image 
-                src={promo.image_url} 
-                alt={promo.name}
-                fill
-                sizes="120px"
-                className="object-contain p-2 transform -rotate-6 mix-blend-multiply" 
-              />
-            ) : (
-              <div className="text-[10px] text-slate-400 font-bold">Sem Imagem</div>
-            )}
-          </div>
-        </div>
+        <Link
+          href={destinoLink}
+          className="group relative flex h-full w-full overflow-hidden rounded-2xl border border-slate-100/60 bg-[#f4f8f0] shadow-sm transition-shadow duration-300 hover:shadow-[0_18px_40px_rgba(15,23,42,0.12)] md:rounded-[2rem]"
+        >
+          <div className="relative flex h-full w-[40%] items-center justify-center overflow-hidden bg-[#b2e633]/10 sm:w-[45%]">
+            <div className="absolute -left-20 -top-20 h-48 w-48 rounded-full bg-[#b2e633] opacity-90 sm:h-64 sm:w-64" />
+            <div className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-[#b2e633] opacity-95 sm:h-44 sm:w-44" />
 
-        <div className="w-[60%] sm:w-[55%] flex flex-col justify-center items-start pl-3 sm:pl-4 pr-3 sm:pr-4 z-10">
-          <span className="text-[10px] sm:text-sm italic font-medium tracking-tight text-[#0e4d32] opacity-90">
-            Oferta Especial
-          </span>
-          <h3 className="text-xs sm:text-base font-black tracking-tight leading-tight my-0.5 text-[#0e4d32] line-clamp-2 uppercase">
-            {promo.name}
-          </h3>
-          <p className="text-[10px] sm:text-xs font-semibold text-slate-500/90 leading-none mt-1">Com até</p>
-          <div className="flex items-baseline">
-            <span className="text-2xl sm:text-3xl font-black tracking-tighter leading-none text-[#0e4d32]">
-              {discountParts[0]}
-            </span>
-            {discountParts[1] && (
-              <span className="text-xs sm:text-sm font-bold ml-1 text-[#0e4d32]">
-                {discountParts[1]}
-              </span>
-            )}
+            <div className="relative z-10 flex h-full w-full items-center justify-center p-3 drop-shadow-md sm:p-4">
+              {promo.image_url ? (
+                <Image
+                  src={promo.image_url}
+                  alt={promo.name}
+                  fill
+                  sizes="160px"
+                  className="-rotate-6 object-contain p-2 mix-blend-multiply transition-transform duration-500 ease-out group-hover:rotate-0 group-hover:scale-[1.03]"
+                />
+              ) : (
+                <div className="text-[10px] font-bold text-slate-400">Sem Imagem</div>
+              )}
+            </div>
           </div>
-        </div>
-      </Link>
+
+          <div className="z-10 flex w-[60%] flex-col items-start justify-center pl-3 pr-3 sm:w-[55%] sm:pl-4 sm:pr-4">
+            <span className="text-[10px] font-medium italic tracking-tight text-[#0e4d32] opacity-90 sm:text-sm">
+              Oferta Especial
+            </span>
+            <h3 className="my-0.5 line-clamp-2 text-xs font-black uppercase leading-tight tracking-tight text-[#0e4d32] sm:text-base">
+              {promo.name}
+            </h3>
+            <p className="mt-1 text-[10px] font-semibold leading-none text-slate-500/90 sm:text-xs">Com até</p>
+            <div className="flex items-baseline">
+              <span className="text-2xl font-black leading-none tracking-tighter text-[#0e4d32] sm:text-3xl">
+                {discountParts[0]}
+              </span>
+              {discountParts[1] && (
+                <span className="ml-1 text-xs font-bold text-[#0e4d32] sm:text-sm">
+                  {discountParts[1]}
+                </span>
+              )}
+            </div>
+          </div>
+        </Link>
+      </motion.div>
     );
   };
 
-  const precisaAnimar = promos.length > 2;return (
-    <section className="w-full bg-slate-50/50 pt-6 pb-4 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 mb-3 sm:mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-          As melhores ofertas
-        </h2>
+  const precisaAnimar = promos.length > 2 && !reduceMotion;
+
+  return (
+    <motion.section
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: reduceMotion ? 0.01 : 0.6, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full overflow-hidden bg-slate-50/50 pb-4 pt-6"
+    >
+      <div className="mx-auto mb-3 max-w-7xl px-4 sm:mb-4">
+        <h2 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">As melhores ofertas</h2>
       </div>
-      
-      <div className="flex w-full overflow-hidden `[mask-image:_linear-gradient(to_right,transparent_0,_black_10%,_black_90%,transparent_100%)]`">
-        <div 
-          className={`flex gap-3 sm:gap-4 md:gap-5 py-2 whitespace-nowrap min-w-full ${
-            precisaAnimar 
-              ? "animate-infinite-scroll hover:[animation-play-state:paused]" 
-              : "justify-start px-4 sm:px-8"
-          }`}
-          // ✅ Velocidade controlada pelo globals.css (15s)
-        >
-          {promos.map((promo, idx) => renderCard(promo, idx))}
-          {precisaAnimar && promos.map((promo, idx) => renderCard(promo, idx + promos.length))}
-        </div>
+
+      <div className="w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent_0,black_8%,black_92%,transparent_100%)]">
+        {precisaAnimar ? (
+          <div className="animate-infinite-scroll flex w-max py-2 hover:[animation-play-state:paused]">
+            <div className="flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-5 md:pr-5">
+              {promos.map((promo, idx) => renderCard(promo, idx))}
+            </div>
+            <div className="flex shrink-0 gap-3 pr-3 sm:gap-4 sm:pr-4 md:gap-5 md:pr-5" aria-hidden="true">
+              {promos.map((promo, idx) => renderCard(promo, idx + promos.length))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex gap-3 overflow-x-auto px-4 py-2 sm:gap-4 sm:px-8 md:gap-5">
+            {promos.map((promo, idx) => renderCard(promo, idx))}
+          </div>
+        )}
       </div>
-    </section>
+    </motion.section>
   );
 }

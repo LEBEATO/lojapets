@@ -1,14 +1,24 @@
 "use client";
 
-import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useCart } from "@/hooks/useCart";
 import { HiXMark, HiMinus, HiPlus, HiTrash, HiOutlineShoppingBag } from "react-icons/hi2";
 import { FaWhatsapp } from "react-icons/fa";
 import { formatPrice, generateWhatsAppLink } from "@/lib/utils";
 import { WHATSAPP_NUMBER } from "@/config/constants";
 
 export default function CartSidebar() {
-  const { cart, isCartOpen, setIsCartOpen, updateQuantity, removeFromCart, cartTotal, clearCart } = useCart();
+  const {
+    cart,
+    isCartOpen,
+    setIsCartOpen,
+    updateQuantity,
+    removeFromCart,
+    cartTotal,
+    clearCart,
+  } = useCart();
+  const reduceMotion = useReducedMotion();
 
   const handleWhatsAppCheckout = () => {
     if (cart.length === 0) return;
@@ -28,119 +38,173 @@ export default function CartSidebar() {
     message += "Eles estão disponíveis para entrega?";
 
     const whatsappUrl = generateWhatsAppLink(WHATSAPP_NUMBER, message);
-    
+
     clearCart();
     setIsCartOpen(false);
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
-  if (!isCartOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Fundo escurecido */}
-      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity" onClick={() => setIsCartOpen(false)} />
+    <AnimatePresence>
+      {isCartOpen && (
+        <motion.div
+          className="fixed inset-0 z-50 overflow-hidden"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 1 }}
+        >
+          <motion.button
+            type="button"
+            aria-label="Fechar carrinho"
+            className="absolute inset-0 h-full w-full bg-slate-900/40 backdrop-blur-sm"
+            onClick={() => setIsCartOpen(false)}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reduceMotion ? 0.01 : 0.24 }}
+          />
 
-      {/* Sidebar do Carrinho — mais estreito no mobile */}
-      <div className="absolute inset-y-3 right-3 sm:inset-y-0 sm:right-0 flex w-[min(280px,calc(100vw-1.5rem))] sm:w-full sm:max-w-md">
-        <div className="flex-1 bg-white shadow-xl flex flex-col rounded-2xl sm:rounded-none overflow-hidden">
-          
-          {/* Cabeçalho - Reduzido */}
-          <div className="flex-shrink-0 px-2.5 py-2 sm:px-6 sm:py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="text-xs sm:text-lg font-black text-slate-800 flex items-center gap-1 sm:gap-1.5">
-              <HiOutlineShoppingBag className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-emerald-600" /> 
-              <span>Carrinho</span>
-              {cart.length > 0 && (
-                <span className="text-xs bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-full">
-                  {cart.length}
-                </span>
-              )}
-            </h2>
-            <button 
-              onClick={() => setIsCartOpen(false)} 
-              className="p-1 rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors"
-              aria-label="Fechar carrinho"
-            >
-              <HiXMark className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Listagem de Itens - Compacta */}
-          <div className="flex-1 overflow-y-auto p-2 sm:p-6 space-y-1.5 sm:space-y-4">
-            {cart.length === 0 ? (
-              <div className="text-center py-8 sm:py-12 text-slate-400 text-xs sm:text-sm font-medium">
-                Seu carrinho está vazio.
+          <motion.div
+            initial={reduceMotion ? { x: 0, opacity: 0 } : { x: "104%", opacity: 0.9 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={reduceMotion ? { x: 0, opacity: 0 } : { x: "104%", opacity: 0.92 }}
+            transition={
+              reduceMotion
+                ? { duration: 0.01 }
+                : { type: "spring", stiffness: 320, damping: 32, mass: 0.86 }
+            }
+            className="absolute inset-y-3 right-3 flex w-[min(280px,calc(100vw-1.5rem))] sm:inset-y-0 sm:right-0 sm:w-full sm:max-w-md"
+          >
+            <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:rounded-none">
+              <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-100 px-2.5 py-2 sm:px-6 sm:py-4">
+                <h2 className="flex items-center gap-1 text-xs font-black text-slate-800 sm:gap-1.5 sm:text-lg">
+                  <HiOutlineShoppingBag className="h-3.5 w-3.5 text-emerald-600 sm:h-5 sm:w-5" />
+                  <span>Carrinho</span>
+                  {cart.length > 0 && (
+                    <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-xs text-emerald-700">
+                      {cart.length}
+                    </span>
+                  )}
+                </h2>
+                <motion.button
+                  type="button"
+                  onClick={() => setIsCartOpen(false)}
+                  whileHover={reduceMotion ? undefined : { scale: 1.08, rotate: 4 }}
+                  whileTap={reduceMotion ? undefined : { scale: 0.92 }}
+                  className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-50 hover:text-slate-600"
+                  aria-label="Fechar carrinho"
+                >
+                  <HiXMark className="h-5 w-5" />
+                </motion.button>
               </div>
-            ) : (
-              cart.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 bg-slate-50 p-1.5 sm:p-2 rounded-lg sm:rounded-xl border border-slate-100">
-                  <div className="w-9 h-9 sm:w-16 sm:h-16 bg-white rounded-md sm:rounded-lg relative overflow-hidden flex-shrink-0 p-0.5 border border-slate-100">
-                    <Image src={item.image_url} alt={item.name} fill className="object-contain p-0.5" />
-                  </div>
 
-                  {/* Informações - Compactas */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-bold text-slate-800 truncate">{item.name.length > 15 ? item.name.slice(0, 15) + '...' : item.name}
-                    </h4>
-                    <p className="text-xs font-extrabold text-emerald-600">
-                      {formatPrice(item.price)}
-                    </p>
-                    
-                    {/* Controles - Menores */}
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <button 
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)} 
-                        className="p-0.5 bg-white border border-slate-200 rounded-md text-slate-600 hover:bg-slate-100 transition-colors"
-                      >
-                        <HiMinus className="w-3 h-3" />
-                      </button>
-                      <span className="text-xs font-bold text-slate-700 w-4 text-center">
-                        {item.quantity}
-                      </span>
-                      <button 
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)} 
-                        className="p-0.5 bg-white border border-slate-200 rounded-md text-slate-600 hover:bg-slate-100 transition-colors"
-                      >
-                        <HiPlus className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {/* Botão Remover - Menor */}
-                  <button 
-                    onClick={() => removeFromCart(item.id)} 
-                    className="p-1 text-slate-400 hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
-                    aria-label="Remover produto"
-                  >
-                    <HiTrash className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Rodapé - Compacto */}
-          {cart.length > 0 && (
-            <div className="flex-shrink-0 px-2.5 py-2 sm:px-6 sm:py-4 border-t border-slate-100 space-y-1.5 sm:space-y-2 bg-white">
-              <div className="flex items-center justify-between text-slate-800 font-bold">
-                <span className="text-[11px] sm:text-sm">Total:</span>
-                <span className="text-sm sm:text-xl font-black text-slate-950">
-                  {formatPrice(cartTotal)}
-                </span>
-              </div>
-              
-              <button
-                onClick={handleWhatsAppCheckout}
-                className="w-full flex items-center justify-center gap-1.5 sm:gap-2 bg-[#25D366] hover:bg-[#20ba5a] text-white font-bold py-1.5 sm:py-2 px-2.5 sm:px-3 rounded-lg sm:rounded-xl transition-colors duration-200 text-[11px] sm:text-sm shadow-sm active:scale-95"
+              <motion.div
+                className="flex-1 space-y-1.5 overflow-y-auto p-2 sm:space-y-4 sm:p-6"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: {
+                    transition: { staggerChildren: reduceMotion ? 0 : 0.055, delayChildren: 0.08 },
+                  },
+                }}
               >
-                <FaWhatsapp className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span>Finalizar no WhatsApp</span>
-              </button>
-            </div>
-          )}
+                {cart.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="py-8 text-center text-xs font-medium text-slate-400 sm:py-12 sm:text-sm"
+                  >
+                    Seu carrinho está vazio.
+                  </motion.div>
+                ) : (
+                  cart.map((item) => (
+                    <motion.div
+                      key={item.id}
+                      variants={{
+                        hidden: reduceMotion ? { opacity: 0 } : { opacity: 0, x: 18 },
+                        visible: { opacity: 1, x: 0 },
+                      }}
+                      transition={{ duration: reduceMotion ? 0.01 : 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      layout={!reduceMotion}
+                      className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-1.5 sm:rounded-xl sm:p-2"
+                    >
+                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-md border border-slate-100 bg-white p-0.5 sm:h-16 sm:w-16 sm:rounded-lg">
+                        <Image src={item.image_url} alt={item.name} fill className="object-contain p-0.5" />
+                      </div>
 
-        </div>
-      </div>
-    </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-xs font-bold text-slate-800">
+                          {item.name.length > 15 ? item.name.slice(0, 15) + "..." : item.name}
+                        </h4>
+                        <p className="text-xs font-extrabold text-emerald-600">{formatPrice(item.price)}</p>
+
+                        <div className="mt-0.5 flex items-center gap-1">
+                          <motion.button
+                            type="button"
+                            whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            className="rounded-md border border-slate-200 bg-white p-0.5 text-slate-600 transition-colors hover:bg-slate-100"
+                            aria-label={`Diminuir quantidade de ${item.name}`}
+                          >
+                            <HiMinus className="h-3 w-3" />
+                          </motion.button>
+                          <span className="w-4 text-center text-xs font-bold text-slate-700">{item.quantity}</span>
+                          <motion.button
+                            type="button"
+                            whileTap={reduceMotion ? undefined : { scale: 0.88 }}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            className="rounded-md border border-slate-200 bg-white p-0.5 text-slate-600 transition-colors hover:bg-slate-100"
+                            aria-label={`Aumentar quantidade de ${item.name}`}
+                          >
+                            <HiPlus className="h-3 w-3" />
+                          </motion.button>
+                        </div>
+                      </div>
+
+                      <motion.button
+                        type="button"
+                        whileHover={reduceMotion ? undefined : { scale: 1.06 }}
+                        whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+                        onClick={() => removeFromCart(item.id)}
+                        className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                        aria-label={`Remover ${item.name}`}
+                      >
+                        <HiTrash className="h-3.5 w-3.5" />
+                      </motion.button>
+                    </motion.div>
+                  ))
+                )}
+              </motion.div>
+
+              {cart.length > 0 && (
+                <motion.div
+                  initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: reduceMotion ? 0 : 0.12, duration: 0.3 }}
+                  className="flex-shrink-0 space-y-1.5 border-t border-slate-100 bg-white px-2.5 py-2 sm:space-y-2 sm:px-6 sm:py-4"
+                >
+                  <div className="flex items-center justify-between font-bold text-slate-800">
+                    <span className="text-[11px] sm:text-sm">Total:</span>
+                    <span className="text-sm font-black text-slate-950 sm:text-xl">{formatPrice(cartTotal)}</span>
+                  </div>
+
+                  <motion.button
+                    type="button"
+                    onClick={handleWhatsAppCheckout}
+                    whileHover={reduceMotion ? undefined : { y: -1 }}
+                    whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                    className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors duration-200 hover:bg-[#20ba5a] sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm"
+                  >
+                    <FaWhatsapp className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <span>Finalizar no WhatsApp</span>
+                  </motion.button>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

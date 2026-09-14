@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
-import { ToastMessage } from '@/context/ToastContext';
+import { motion, useReducedMotion } from "framer-motion";
+import { CheckCircle2, CircleAlert, CircleX, Info, X } from "lucide-react";
+import { ToastMessage } from "@/context/ToastContext";
 
 interface ToastItemProps {
   toast: ToastMessage;
@@ -9,48 +10,64 @@ interface ToastItemProps {
 }
 
 const icons = {
-  success: '✅',
-  error: '❌',
-  warning: '⚠️',
-  info: 'ℹ️',
+  success: CheckCircle2,
+  error: CircleX,
+  warning: CircleAlert,
+  info: Info,
 };
 
 const colors = {
-  success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
-  error: 'border-red-200 bg-red-50 text-red-800',
-  warning: 'border-amber-200 bg-amber-50 text-amber-800',
-  info: 'border-blue-200 bg-blue-50 text-blue-800',
+  success: "border-emerald-200/90 bg-white text-emerald-900 shadow-emerald-950/10",
+  error: "border-red-200/90 bg-white text-red-900 shadow-red-950/10",
+  warning: "border-amber-200/90 bg-white text-amber-900 shadow-amber-950/10",
+  info: "border-blue-200/90 bg-white text-blue-900 shadow-blue-950/10",
+};
+
+const iconColors = {
+  success: "bg-emerald-50 text-emerald-600",
+  error: "bg-red-50 text-red-600",
+  warning: "bg-amber-50 text-amber-600",
+  info: "bg-blue-50 text-blue-600",
 };
 
 export function ToastItem({ toast, onRemove }: ToastItemProps) {
-  const [isVisible, setIsVisible] = useState(true);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => onRemove(toast.id), 300);
-  };
+  const reduceMotion = useReducedMotion();
+  const Icon = icons[toast.type];
 
   return (
-    <div
-      className={`
-        relative flex items-start gap-3 p-4 pr-10 rounded-xl border shadow-lg
-        ${colors[toast.type]} transition-all duration-300 w-full max-w-sm
-        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}
-     `}
-      role="alert"
+    <motion.div
+      layout={!reduceMotion}
+      initial={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 30, y: -8, scale: 0.97 }}
+      animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
+      exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: 22, scale: 0.98 }}
+      transition={
+        reduceMotion
+          ? { duration: 0.01 }
+          : { type: "spring", stiffness: 360, damping: 30, mass: 0.82 }
+      }
+      className={`relative flex w-full max-w-sm items-start gap-3 rounded-2xl border p-3.5 pr-10 shadow-xl backdrop-blur-xl ${colors[toast.type]}`}
+      role={toast.type === "error" ? "alert" : "status"}
+      aria-live={toast.type === "error" ? "assertive" : "polite"}
     >
-      <span className="text-xl flex-shrink-0">{icons[toast.type]}</span>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-bold">{toast.title}</p>
-        {toast.message && <p className="text-xs opacity-80 mt-0.5">{toast.message}</p>}
+      <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${iconColors[toast.type]}`}>
+        <Icon className="h-5 w-5" aria-hidden="true" />
+      </span>
+
+      <div className="min-w-0 flex-1 pt-0.5">
+        <p className="text-sm font-extrabold tracking-tight">{toast.title}</p>
+        {toast.message && <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{toast.message}</p>}
       </div>
-      <button
-        onClick={handleClose}
-        className="absolute top-2 right-2 p-1 text-slate-500 hover:text-slate-700 rounded-lg hover:bg-white/50 transition-colors"
+
+      <motion.button
+        type="button"
+        whileHover={reduceMotion ? undefined : { scale: 1.08 }}
+        whileTap={reduceMotion ? undefined : { scale: 0.9 }}
+        onClick={() => onRemove(toast.id)}
+        className="absolute right-2 top-2 rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         aria-label="Fechar notificação"
       >
-        ✕
-      </button>
-    </div>
+        <X className="h-4 w-4" />
+      </motion.button>
+    </motion.div>
   );
 }

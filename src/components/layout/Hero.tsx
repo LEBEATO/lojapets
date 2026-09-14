@@ -1,9 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
-import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 
 const HERO_IMAGES = [
   "/pet1.jpg",
@@ -16,63 +22,71 @@ const HERO_IMAGES = [
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
-    if (HERO_IMAGES.length <= 1) return;
+    if (HERO_IMAGES.length <= 1 || reduceMotion) return;
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       setCurrentImageIndex((prev) => (prev + 1) % HERO_IMAGES.length);
-    }, 5000);
+    }, 5600);
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => window.clearInterval(interval);
+  }, [reduceMotion]);
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end start"],
   });
 
-  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.05]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
+  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.055]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.2 },
+      transition: { staggerChildren: reduceMotion ? 0 : 0.12, delayChildren: 0.12 },
     },
   };
 
   const textVariants = {
-    hidden: { opacity: 0, y: 15 },
+    hidden: reduceMotion
+      ? { opacity: 0 }
+      : { opacity: 0, y: 22, filter: "blur(8px)" },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as const },
+      filter: "blur(0px)",
+      transition: {
+        duration: reduceMotion ? 0.01 : 0.72,
+        ease: [0.16, 1, 0.3, 1] as const,
+      },
     },
   };
 
   return (
     <section ref={containerRef} className="w-full bg-white pb-4 md:pb-8">
-      <div className="w-full overflow-hidden flex flex-col items-center justify-center md:justify-end pb-8 md:pb-12 min-h-[420px] h-[60vh] sm:h-[65vh] md:h-[75vh] text-center px-4 sm:px-6 relative shadow-lg">
-
-        {/* Container da Imagem com Animação Parallax */}
+      <div className="relative flex min-h-[420px] h-[60vh] w-full flex-col items-center justify-center overflow-hidden px-4 pb-8 text-center shadow-lg sm:h-[65vh] sm:px-6 md:h-[75vh] md:justify-end md:pb-12">
         <motion.div
-          style={{ y: imageY, scale: imageScale }}
-          className="absolute inset-0 w-full h-full z-0"
+          style={reduceMotion ? undefined : { y: imageY, scale: imageScale }}
+          className="absolute inset-0 z-0 h-full w-full"
         >
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence initial={false} mode="sync">
             <motion.div
               key={HERO_IMAGES[currentImageIndex]}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={reduceMotion ? { opacity: 1 } : { opacity: 0, scale: 1.015 }}
+              animate={reduceMotion ? { opacity: 1 } : { opacity: 1, scale: 1.065 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 1, ease: "easeInOut" }}
+              transition={{
+                opacity: { duration: reduceMotion ? 0.01 : 1.15, ease: "easeInOut" },
+                scale: { duration: reduceMotion ? 0.01 : 6.2, ease: "linear" },
+              }}
               className="absolute inset-0"
             >
               <Image
                 src={HERO_IMAGES[currentImageIndex]}
-                alt="Banner Pet Shop"
+                alt={`Banner Pet Shop ${currentImageIndex + 1}`}
                 fill
                 sizes="100vw"
                 priority={currentImageIndex === 0}
@@ -82,19 +96,26 @@ export default function Hero() {
           </AnimatePresence>
         </motion.div>
 
-        {/* Overlay com gradiente */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/30 z-10 pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/42 to-black/25" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-28 bg-gradient-to-b from-black/25 to-transparent" />
 
-        {/* Conteúdo textual centralizado */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="max-w-3xl relative z-20 flex flex-col items-center w-full"
+          className="relative z-20 flex w-full max-w-3xl flex-col items-center"
         >
+          <motion.span
+            variants={textVariants}
+            aria-hidden="true"
+            className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-sm shadow-lg backdrop-blur-md"
+          >
+            🐾
+          </motion.span>
+
           <motion.h1
             variants={textVariants}
-            className="text-2xl sm:text-3xl md:text-4xl font-stretch-50% text-white leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2"
+            className="px-2 text-2xl font-black leading-tight tracking-tight text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.45)] sm:text-3xl md:text-5xl"
           >
             Tudo que seu Pet precisa, <br className="hidden md:block" />
             com a entrega que ele merece!
@@ -102,38 +123,59 @@ export default function Hero() {
 
           <motion.p
             variants={textVariants}
-            className="text-slate-100 mt-3 sm:mt-5 text-sm sm:text-base md:text-xl font-medium max-w-xl md:max-w-2xl drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2"
+            className="mt-3 max-w-2xl px-2 text-sm font-medium text-slate-100 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] sm:mt-5 sm:text-base md:text-xl"
           >
             Explore nossa seleção exclusiva de rações, brinquedos e acessórios direto do nosso catálogo dinâmico.
           </motion.p>
 
           <motion.div variants={textVariants} className="mt-6 sm:mt-8">
-            <Link
-              href="#catalogo"
-              className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm sm:text-base py-3 px-6 sm:py-3.5 sm:px-8 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95 duration-200 inline-block">
-              Ver Catálogo Completo 🐾
-            </Link>
+            <motion.div
+              whileHover={reduceMotion ? undefined : { y: -2, scale: 1.025 }}
+              whileTap={reduceMotion ? undefined : { scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 360, damping: 24 }}
+            >
+              <Link
+                href="#catalogo"
+                className="group inline-flex items-center gap-2 rounded-2xl border border-emerald-300/30 bg-emerald-500 px-6 py-3 text-sm font-bold text-white shadow-[0_12px_32px_rgba(16,185,129,0.32)] transition-[background-color,box-shadow] duration-300 hover:bg-emerald-400 hover:shadow-[0_16px_38px_rgba(16,185,129,0.4)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-700 sm:px-8 sm:py-3.5 sm:text-base"
+              >
+                <span>Ver Catálogo Completo</span>
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-300 group-hover:translate-x-0.5"
+                >
+                  🐾
+                </span>
+              </Link>
+            </motion.div>
           </motion.div>
 
-          {/* Dots de navegação */}
           {HERO_IMAGES.length > 1 && (
-            <div className="flex gap-2 mt-5 sm:mt-6 z-20">
-              {HERO_IMAGES.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentImageIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === currentImageIndex
-                      ? "w-6 sm:w-8 bg-emerald-400"
-                      : "w-2 bg-white/50 hover:bg-white"
-                  }`}
-                  aria-label={`Ir para imagem ${index + 1}`}
-                />
-              ))}
-            </div>
+            <motion.div variants={textVariants} className="mt-5 flex gap-2 sm:mt-6">
+              {HERO_IMAGES.map((_, index) => {
+                const isActive = index === currentImageIndex;
+
+                return (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setCurrentImageIndex(index)}
+                    className="group relative h-5 min-w-5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                    aria-label={`Ir para imagem ${index + 1}`}
+                    aria-current={isActive ? "true" : undefined}
+                  >
+                    <span
+                      className={`absolute left-1/2 top-1/2 h-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full transition-all duration-300 ${
+                        isActive
+                          ? "w-7 bg-emerald-400 shadow-[0_0_16px_rgba(52,211,153,0.65)]"
+                          : "w-1.5 bg-white/55 group-hover:bg-white/90"
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </motion.div>
           )}
         </motion.div>
-
       </div>
     </section>
   );
