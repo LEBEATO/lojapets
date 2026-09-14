@@ -58,12 +58,17 @@ export function flyProductToCart(imageUrl: string, sourceElement: HTMLElement | 
     },
   );
 
-  animation.addEventListener("finish", () => {
+  let finished = false;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
     flyer.remove();
     notifyCartArrival();
-  });
+  };
 
-  animation.addEventListener("cancel", () => flyer.remove());
+  animation.addEventListener("finish", finish, { once: true });
+  animation.addEventListener("cancel", finish, { once: true });
 }
 
 export { CART_ITEM_ADDED_EVENT };
