@@ -127,14 +127,54 @@ export const productService = {
     }
   },
 
+  async update(id: string, product: Partial<Product>): Promise<ApiResponse<Product>> {
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .update(product)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error: error as Error };
+    }
+  },
+
   async delete(id: string): Promise<ApiResponse<null>> {
     try {
+      const { data: product, error: fetchError } = await supabase
+        .from('products')
+        .select('image_url')
+        .eq('id', id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', id);
 
       if (error) throw error;
+
+      const marker = '/storage/v1/object/public/product-images/';
+      const imagePath = product?.image_url?.includes(marker)
+        ? decodeURIComponent(product.image_url.split(marker)[1])
+        : null;
+
+      if (imagePath) {
+        const { error: storageError } = await supabase.storage
+          .from('product-images')
+          .remove([imagePath]);
+
+        if (storageError) {
+          console.warn('Produto removido, mas não foi possível excluir a imagem do Storage.', storageError);
+        }
+      }
+
       return { data: null, error: null };
     } catch (error) {
       return { data: null, error: error as Error };
