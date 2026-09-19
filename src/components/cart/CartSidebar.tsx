@@ -16,7 +16,6 @@ export default function CartSidebar() {
     updateQuantity,
     removeFromCart,
     cartTotal,
-    clearCart,
   } = useCart();
   const reduceMotion = useReducedMotion();
 
@@ -72,7 +71,7 @@ export default function CartSidebar() {
                 ? { duration: 0.01 }
                 : { type: "spring", stiffness: 320, damping: 32, mass: 0.86 }
             }
-            className="absolute inset-y-0 right-0 flex w-full max-w-[390px] sm:max-w-md"
+            className="absolute inset-y-0 right-0 flex w-full sm:max-w-md"
           >
             <div className="flex flex-1 flex-col overflow-hidden bg-white shadow-2xl">
               <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
@@ -183,7 +182,8 @@ export default function CartSidebar() {
                   transition={{ delay: reduceMotion ? 0 : 0.12, duration: 0.3 }}
                   className="flex-shrink-0 space-y-3 border-t border-slate-100 bg-white px-4 py-4 sm:px-6"
                 >
-                  <p className="text-xs leading-relaxed text-slate-500">Revise os produtos e envie o pedido diretamente para nosso atendimento.</p>\n                  <div className="flex items-center justify-between font-bold text-slate-800">
+                  <p className="text-xs leading-relaxed text-slate-500">Revise os produtos e envie o pedido diretamente para nosso atendimento.</p>
+                  <div className="flex items-center justify-between font-bold text-slate-800">
                     <span className="text-[11px] sm:text-sm">Total:</span>
                     <span className="text-sm font-black text-slate-950 sm:text-xl">{formatPrice(cartTotal)}</span>
                   </div>
