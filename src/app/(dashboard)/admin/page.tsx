@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { HiOutlineCloudUpload, HiOutlineTrash } from "react-icons/hi";
+import { HiOutlineCloudUpload, HiOutlineTrash, HiOutlinePencil } from "react-icons/hi";
+import { FiSearch } from "react-icons/fi";
 import { FiLogOut } from "react-icons/fi";
 import { Product } from "@/types";
 import { formatPrice } from "@/lib/utils";
@@ -24,6 +25,9 @@ export default function AdminPanel() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // ✅ MODAL DE LOGOUT
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -39,6 +43,41 @@ export default function AdminPanel() {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  const categoriesCount = new Set(products.map((product) => product.category_slug)).size;
+  const promotionsCount = products.filter((product) => product.discount_badge || (product.old_price && product.old_price > product.price)).length;
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch = product.name.toLowerCase().includes(search.trim().toLowerCase());
+    const matchesCategory = categoryFilter === "all" || product.category_slug === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const startEditing = (product: Product) => {
+    setEditingProduct(product);
+    setName(product.name);
+    setDescription(product.description);
+    setPrice(String(product.price));
+    setOldPrice(product.old_price ? String(product.old_price) : "");
+    setDiscountBadge(product.discount_badge || "");
+    setSizesString(product.sizes?.join(", ") || "");
+    setCategorySlug(product.category_slug);
+    setImagePreview(product.image_url);
+    setImageFile(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const resetForm = () => {
+    setEditingProduct(null);
+    setName("");
+    setDescription("");
+    setPrice("");
+    setOldPrice("");
+    setDiscountBadge("");
+    setSizesString("");
+    setCategorySlug("racoes");
+    setImageFile(null);
+    setImagePreview(null);
+  };
 
   // ✅ LOGOUT
   const handleLogout = async () => {
@@ -82,7 +121,7 @@ export default function AdminPanel() {
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!imageFile) {
+    if (!imageFile && !editingProduct) {
       showToast('warning', 'Selecione uma imagem', 'É necessário uma foto para o produto.');
       return;
     }
@@ -107,7 +146,9 @@ export default function AdminPanel() {
       sizes: sizesString ? sizesString.split(",").map(s => s.trim()).filter(Boolean) : [],
     };
 
-    const { error } = await productService.create(productData, imageFile);
+    const { error } = editingProduct
+      ? await productService.update(editingProduct.id, productData)
+      : await productService.create(productData, imageFile!);
 
     setLoading(false);
 
@@ -116,22 +157,14 @@ export default function AdminPanel() {
       return;
     }
 
-    showToast('success', 'Produto cadastrado! 🎉', `${name} foi adicionado.`);
-    setName("");
-    setDescription("");
-    setPrice("");
-    setOldPrice("");
-    setDiscountBadge("");
-    setSizesString("");
-    setCategorySlug("racoes");
-    setImageFile(null);
-    setImagePreview(null);
+    showToast('success', editingProduct ? 'Produto atualizado!' : 'Produto cadastrado! 🎉', `${name} foi ${editingProduct ? 'atualizado' : 'adicionado'}.`);
+    resetForm();
 
     fetchProducts();
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6 sm:py-10">
+    <div className="max-w-6xl mx-auto px-3 py-5 sm:px-4 sm:py-10">
       <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         
         {/* CABEÇALHO */}
@@ -153,6 +186,12 @@ export default function AdminPanel() {
             <FiLogOut className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Sair</span>
           </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 border-b border-slate-100 bg-slate-50/70 p-3 sm:gap-4 sm:p-6">
+          <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100"><p className="text-[10px] font-bold uppercase text-slate-400">Produtos</p><p className="mt-1 text-xl font-black text-slate-900">{products.length}</p></div>
+          <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100"><p className="text-[10px] font-bold uppercase text-slate-400">Promoções</p><p className="mt-1 text-xl font-black text-emerald-600">{promotionsCount}</p></div>
+          <div className="rounded-2xl bg-white p-3 shadow-sm ring-1 ring-slate-100"><p className="text-[10px] font-bold uppercase text-slate-400">Categorias</p><p className="mt-1 text-xl font-black text-slate-900">{categoriesCount}</p></div>
         </div>
 
         {/* FORMULÁRIO */}
@@ -293,8 +332,9 @@ export default function AdminPanel() {
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl transition-all disabled:bg-slate-300 text-sm shadow-sm cursor-pointer active:scale-[0.98]"
           >
-            {loading ? 'Publicando...' : '📦 Publicar Produto'}
+            {loading ? 'Salvando...' : editingProduct ? 'Salvar alterações' : '📦 Publicar Produto'}
           </button>
+          {editingProduct && <button type="button" onClick={resetForm} className="w-full rounded-xl border border-slate-200 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50">Cancelar edição</button>}
         </form>
 
         {/* LISTA DE PRODUTOS */}
@@ -306,11 +346,22 @@ export default function AdminPanel() {
             </span>
           </h2>
 
+          <div className="mb-4 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_220px]">
+            <label className="relative">
+              <FiSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Buscar produto..." className="w-full rounded-xl border border-slate-200 py-2.5 pl-9 pr-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20" />
+            </label>
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-emerald-500">
+              <option value="all">Todas as categorias</option>
+              {[...new Set(products.map((product) => product.category_slug))].map((slug) => <option key={slug} value={slug}>{slug}</option>)}
+            </select>
+          </div>
+
           {products.length === 0 ? (
             <p className="text-xs text-slate-400 text-center py-8">Nenhum produto cadastrado.</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto pr-1">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <div key={product.id} className="flex items-center gap-3 p-3 bg-slate-50 hover:bg-slate-100/70 rounded-xl border border-slate-100 transition-colors">
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white border border-slate-200 flex-shrink-0">
                     <Image
@@ -333,6 +384,9 @@ export default function AdminPanel() {
                       <span className="ml-1 text-[9px] uppercase text-slate-400">• {product.category_slug}</span>
                     </p>
                   </div>
+                  <button type="button" onClick={() => startEditing(product)} className="p-1.5 text-slate-400 hover:text-emerald-600 rounded-lg hover:bg-emerald-50 transition-all cursor-pointer flex-shrink-0" title="Editar Produto">
+                    <HiOutlinePencil className="w-4 h-4" />
+                  </button>
                   <button
                     type="button"
                     onClick={() => confirmDelete(product.id, product.name)}

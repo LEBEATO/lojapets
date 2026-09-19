@@ -3,16 +3,13 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Check, ShoppingBag } from "lucide-react";
+import { Check, ShoppingCart } from "lucide-react";
 import { Product } from "@/types";
 import { formatPrice } from "@/lib/utils";
 import { flyProductToCart } from "@/lib/animations/flyToCart";
 import { useToast } from "@/context/ToastContext";
 
-interface ProductCardProps {
-  product: Product;
-  addToCart: (product: Product) => void;
-}
+interface ProductCardProps { product: Product; addToCart: (product: Product) => void; }
 
 export default function ProductCard({ product, addToCart }: ProductCardProps) {
   const [added, setAdded] = useState(false);
@@ -21,116 +18,37 @@ export default function ProductCard({ product, addToCart }: ProductCardProps) {
   const reduceMotion = useReducedMotion();
   const { showToast } = useToast();
 
-  useEffect(() => {
-    return () => {
-      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    };
-  }, []);
+  useEffect(() => () => { if (resetTimerRef.current) clearTimeout(resetTimerRef.current); }, []);
 
   const handleAddToCart = () => {
-    if (product.image_url) {
-      flyProductToCart(product.image_url, imageContainerRef.current);
-    } else if (typeof window !== "undefined") {
-      window.dispatchEvent(new CustomEvent("cart:item-added"));
-    }
-
+    if (product.image_url) flyProductToCart(product.image_url, imageContainerRef.current);
+    else window.dispatchEvent(new CustomEvent("cart:item-added"));
     addToCart(product);
     setAdded(true);
     showToast("success", "Adicionado ao carrinho", product.name, 2400);
-
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => {
-      setAdded(false);
-      resetTimerRef.current = null;
-    }, 1250);
+    resetTimerRef.current = setTimeout(() => { setAdded(false); resetTimerRef.current = null; }, 1250);
   };
 
   return (
-    <motion.article
-      whileHover={reduceMotion ? undefined : { y: -5, scale: 1.008 }}
-      transition={{ type: "spring", stiffness: 340, damping: 28 }}
-      className="group relative flex min-h-[240px] h-auto w-full flex-col rounded-2xl border border-slate-100/90 bg-white p-2.5 shadow-[0_6px_20px_rgba(15,23,42,0.05)] transition-shadow duration-300 hover:shadow-[0_18px_42px_rgba(15,23,42,0.12)]"
-    >
-      {product.discount_badge && (
-        <motion.span
-          initial={reduceMotion ? false : { opacity: 0, scale: 0.78, rotate: -4 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 420, damping: 24, delay: 0.12 }}
-          className="absolute left-2 top-2 z-10 rounded-lg bg-amber-400 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-slate-900 shadow-sm"
-        >
-          {product.discount_badge}
-        </motion.span>
-      )}
-
-      <div
-        ref={imageContainerRef}
-        className="relative mb-2 flex h-32 w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 to-emerald-50/35 p-2"
-      >
-        {product.image_url ? (
-          <motion.div
-            className="absolute inset-0"
-            whileHover={reduceMotion ? undefined : { scale: 1.055, y: -2 }}
-            transition={{ type: "spring", stiffness: 260, damping: 26 }}
-          >
-            <Image
-              src={product.image_url}
-              alt={product.name}
-              fill
-              sizes="(max-width: 480px) 45vw, (max-width: 768px) 30vw, 250px"
-              className="object-contain p-1"
-            />
-          </motion.div>
-        ) : (
-          <div className="text-[10px] text-slate-400">Sem imagem</div>
-        )}
+    <motion.article whileHover={reduceMotion ? undefined : { y: -3 }} className="group relative flex h-full min-h-[292px] w-full flex-col overflow-hidden rounded-[1.35rem] border border-slate-200 bg-white p-2.5 shadow-sm transition-shadow hover:shadow-lg min-[390px]:min-h-[310px] min-[390px]:rounded-[1.6rem] min-[390px]:p-3 sm:min-h-[350px]">
+      {product.discount_badge && <span className="absolute left-2 top-2 z-10 max-w-[75%] rounded-md bg-orange-100 px-1.5 py-1 text-[9px] font-black text-orange-700 min-[390px]:left-3 min-[390px]:top-3 min-[390px]:text-[10px]">{product.discount_badge}</span>}
+      <div ref={imageContainerRef} className="relative mb-2 h-32 w-full overflow-hidden rounded-xl bg-white min-[390px]:h-36 sm:mb-3 sm:h-48 sm:rounded-2xl">
+        {product.image_url ? <Image src={product.image_url} alt={product.name} fill sizes="(max-width: 639px) 45vw, 260px" className="object-contain p-1.5 transition-transform duration-300 group-hover:scale-105 sm:p-2" /> : <div className="flex h-full items-center justify-center text-[10px] text-slate-400">Sem imagem</div>}
       </div>
-
-      <div className="flex flex-1 flex-col">
-        <h3 className="line-clamp-1 pt-1 text-xs font-bold uppercase tracking-tight text-slate-900">
-          {product.name}
-        </h3>
-        <p className="mt-0.5 min-h-[24px] line-clamp-2 text-[10px] leading-snug text-slate-400">
-          {product.description}
-        </p>
-      </div>
-
-      <div className="mt-2 flex items-center justify-between gap-1 border-t border-slate-50 pt-2">
-        <div className="flex flex-col">
-          {product.old_price && product.old_price > 0 && (
-            <span className="mb-0.5 text-[9px] leading-none text-slate-400 line-through">
-              {formatPrice(product.old_price)}
-            </span>
-          )}
-          <span className="text-base font-black leading-none text-slate-950">
-            {formatPrice(product.price)}
-          </span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-slate-400 sm:text-[10px]">Loja Pets</p>
+        <h3 className="line-clamp-2 text-[12px] font-bold leading-[1.3] text-slate-800 min-[390px]:text-[13px] sm:text-sm">{product.name}</h3>
+        <p className="mt-1 line-clamp-1 text-[10px] text-slate-400 sm:line-clamp-2 sm:text-xs">{product.description}</p>
+        <div className="mt-auto pt-2.5 sm:pt-4">
+          {product.old_price && product.old_price > product.price && <span className="block text-[10px] text-slate-400 line-through sm:text-xs">{formatPrice(product.old_price)}</span>}
+          <div className="mt-1 flex items-end justify-between gap-1">
+            <span className="min-w-0 text-[15px] font-black tracking-tight text-slate-950 min-[390px]:text-base sm:text-lg">{formatPrice(product.price)}</span>
+            <motion.button type="button" onClick={handleAddToCart} whileTap={reduceMotion ? undefined : { scale: 0.9 }} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-500/20 hover:bg-emerald-600 min-[390px]:h-10 min-[390px]:w-10 sm:h-11 sm:w-11" aria-label={`Adicionar ${product.name} ao carrinho`}>
+              {added ? <Check className="h-4 w-4 sm:h-5 sm:w-5" /> : <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />}
+            </motion.button>
+          </div>
         </div>
-
-        <motion.button
-          type="button"
-          onClick={handleAddToCart}
-          whileHover={reduceMotion ? undefined : { y: -1 }}
-          whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-          transition={{ type: "spring", stiffness: 480, damping: 28 }}
-          className={`flex min-w-[86px] items-center justify-center gap-1 rounded-xl px-2.5 py-1.5 text-[10px] font-bold text-white shadow-sm transition-colors duration-300 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${
-            added
-              ? "bg-emerald-600 shadow-emerald-600/20"
-              : "bg-emerald-500 shadow-emerald-500/20 hover:bg-emerald-600"
-          }`}
-          aria-label={`Adicionar ${product.name} ao carrinho`}
-        >
-          {added ? (
-            <>
-              <span>Adicionado</span>
-              <Check className="h-3 w-3" aria-hidden="true" />
-            </>
-          ) : (
-            <>
-              <span>Comprar</span>
-              <ShoppingBag className="h-3 w-3" aria-hidden="true" />
-            </>
-          )}
-        </motion.button>
       </div>
     </motion.article>
   );

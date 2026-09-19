@@ -1,32 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  AnimatePresence,
-  motion,
-  useAnimationControls,
-  useReducedMotion,
-} from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "framer-motion";
 import { useCart } from "@/hooks/useCart";
-import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { CART_ITEM_ADDED_EVENT } from "@/lib/animations/flyToCart";
 import { HiOutlineShoppingBag } from "react-icons/hi2";
-import {
-  ShoppingBag,
-  Package,
-  Beef,
-  ToyBrick,
-  Sparkles,
-  Shirt,
-  Pill,
-  BadgePercent,
-  Heart,
-  ChevronDown,
-  Menu,
-  X,
-} from "lucide-react";
+import { BadgePercent, Beef, Heart, Home, Menu, Package, Pill, Shirt, Sparkles, ToyBrick, X, ChevronRight } from "lucide-react";
 
 const menuItems = [
   { title: "Rações", href: "/produtos/categoria/racoes", icon: Package },
@@ -36,178 +16,77 @@ const menuItems = [
   { title: "Acessórios", href: "/produtos/categoria/acessorios", icon: Shirt },
   { title: "Medicamentos", href: "/produtos/categoria/medicamentos", icon: Pill },
   { title: "Promoções", href: "/promocoes", icon: BadgePercent },
-  { title: "Sobre Nós", href: "/sobre", icon: Heart },
+  { title: "Sobre nós", href: "/sobre", icon: Heart },
 ];
 
 export default function Navbar() {
   const { cartCount, setIsCartOpen } = useCart();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
   const reduceMotion = useReducedMotion();
   const cartControls = useAnimationControls();
 
-  const closeMenus = useCallback(() => {
-    setMobileMenuOpen(false);
-  }, []);
-
-  const menuRef = useOutsideClick(closeMenus);
-  const isHomeTop = pathname === "/" && !scrolled;
-
-  useEffect(() => {
-    const updateScrollState = () => setScrolled(window.scrollY > 18);
-    updateScrollState();
-    window.addEventListener("scroll", updateScrollState, { passive: true });
-    return () => window.removeEventListener("scroll", updateScrollState);
-  }, []);
-
   useEffect(() => {
     const handleCartArrival = () => {
-      if (reduceMotion) return;
-      cartControls.start({
-        scale: [1, 1.2, 0.94, 1],
-        rotate: [0, -5, 4, 0],
-        transition: { type: "spring", stiffness: 420, damping: 24, duration: 0.46 },
-      });
+      if (!reduceMotion) cartControls.start({ scale: [1, 1.18, 1], transition: { duration: 0.35 } });
     };
-
     window.addEventListener(CART_ITEM_ADDED_EVENT, handleCartArrival);
     return () => window.removeEventListener(CART_ITEM_ADDED_EVENT, handleCartArrival);
   }, [cartControls, reduceMotion]);
 
+  useEffect(() => {
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [open]);
+
   return (
-    <nav
-      ref={menuRef}
-      className={`fixed left-0 top-0 z-50 flex h-14 w-full items-center justify-center px-3 transition-[background-color,box-shadow,border-color,backdrop-filter] duration-500 sm:h-16 sm:px-6 lg:px-8 ${
-        isHomeTop
-          ? "border-b border-white/10 bg-transparent shadow-none"
-          : "border-b border-slate-200/70 bg-white/82 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur-xl"
-      }`}
-    >
-      <div className="flex w-full max-w-7xl items-center justify-between">
-        <Link
-          href="/"
-          className="group flex items-center gap-1 text-lg font-black tracking-tight sm:text-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
-        >
-          <span className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" aria-hidden="true">🐾</span>
-          <span className="text-emerald-500">PET</span>
-          <span className={isHomeTop ? "text-white" : "text-slate-800"}>LOJA</span>
-        </Link>
-
-        <div className="flex items-center gap-2 sm:gap-4">
-          <motion.button
-            type="button"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            whileHover={reduceMotion ? undefined : { y: -1 }}
-            whileTap={reduceMotion ? undefined : { scale: 0.97 }}
-            className={`hidden items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-bold transition-colors sm:px-4 sm:py-2 sm:text-sm md:flex ${
-              mobileMenuOpen
-                ? "bg-emerald-50 text-emerald-600"
-                : isHomeTop
-                  ? "text-white hover:bg-white/12"
-                  : "text-slate-700 hover:bg-slate-50"
-            }`}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="products-menu"
-          >
-            <ShoppingBag className="h-4 w-4" />
-            <span>Produtos</span>
-            <ChevronDown className={`h-4 w-4 transition-transform duration-300 ${mobileMenuOpen ? "rotate-180" : ""}`} />
-          </motion.button>
-
-          <motion.button
-            type="button"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            whileTap={reduceMotion ? undefined : { scale: 0.92 }}
-            className={`flex items-center gap-1 rounded-xl p-1.5 text-xs font-bold transition-colors md:hidden ${
-              isHomeTop ? "text-white" : "text-slate-700 hover:text-emerald-600"
-            }`}
-            aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
-            aria-expanded={mobileMenuOpen}
-            aria-controls="products-menu"
-          >
-            <AnimatePresence initial={false} mode="wait">
-              <motion.span
-                key={mobileMenuOpen ? "close" : "open"}
-                initial={reduceMotion ? false : { opacity: 0, rotate: -18, scale: 0.8 }}
-                animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                exit={reduceMotion ? undefined : { opacity: 0, rotate: 18, scale: 0.8 }}
-                transition={{ duration: reduceMotion ? 0.01 : 0.18 }}
-              >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-              </motion.span>
-            </AnimatePresence>
-          </motion.button>
-
-          <motion.button
-            data-cart-target
-            type="button"
-            animate={cartControls}
-            onClick={() => {
-              setMobileMenuOpen(false);
-              setIsCartOpen(true);
-            }}
-            whileHover={reduceMotion ? undefined : { y: -1, scale: 1.04 }}
-            whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-            className={`relative rounded-xl p-1.5 transition-colors sm:p-2 ${
-              isHomeTop ? "text-white hover:bg-white/12" : "text-slate-700 hover:bg-slate-50 hover:text-emerald-600"
-            }`}
-            aria-label="Abrir carrinho"
-          >
-            <HiOutlineShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
-            <AnimatePresence initial={false}>
-              {cartCount > 0 && (
-                <motion.span
-                  key={cartCount}
-                  initial={reduceMotion ? false : { scale: 0.6, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.6, opacity: 0 }}
-                  transition={{ type: "spring", stiffness: 500, damping: 28 }}
-                  className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm sm:h-5 sm:w-5 sm:text-[10px]"
-                >
-                  {cartCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
+    <>
+      <nav className="fixed left-0 top-0 z-50 flex h-16 w-full items-center bg-emerald-600 px-4 text-white shadow-md sm:px-6">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-3 items-center">
+          <button type="button" onClick={() => setOpen(true)} className="justify-self-start rounded-xl p-2 hover:bg-white/10" aria-label="Abrir menu">
+            <Menu className="h-7 w-7" />
+          </button>
+          <Link href="/" className="justify-self-center whitespace-nowrap text-xl font-black italic tracking-tight sm:text-2xl">
+            <span className="mr-1" aria-hidden="true">🐾</span>Loja Pets
+          </Link>
+          <motion.button data-cart-target type="button" animate={cartControls} onClick={() => setIsCartOpen(true)} className="relative justify-self-end rounded-xl p-2 hover:bg-white/10" aria-label="Abrir carrinho">
+            <HiOutlineShoppingBag className="h-7 w-7" />
+            {cartCount > 0 && <span className="absolute right-0 top-0 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-black">{cartCount}</span>}
           </motion.button>
         </div>
-      </div>
+      </nav>
 
       <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            id="products-menu"
-            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 0.985 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8, scale: 0.985 }}
-            transition={{ duration: reduceMotion ? 0.01 : 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute left-0 right-0 top-14 z-50 border-b border-slate-100 bg-white px-4 py-3 shadow-xl sm:top-16 md:left-auto md:right-8 md:w-[380px] md:rounded-3xl md:border"
-          >
-            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-              {menuItems.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <motion.div
-                    key={item.title}
-                    initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: reduceMotion ? 0 : index * 0.025, duration: 0.22 }}
-                  >
-                    <Link
-                      href={item.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="group flex items-center gap-3 rounded-2xl px-3 py-2.5 transition-colors hover:bg-emerald-50/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                    >
-                      <Icon className="h-4 w-4 text-slate-600 transition-[color,transform] duration-200 group-hover:scale-110 group-hover:text-emerald-600" />
-                      <span className="text-xs font-bold text-slate-700 transition-colors group-hover:text-emerald-700 sm:text-sm">{item.title}</span>
-                    </Link>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
+        {open && (
+          <>
+            <motion.button aria-label="Fechar menu" className="fixed inset-0 z-[60] bg-slate-950/45" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setOpen(false)} />
+            <motion.aside
+              initial={reduceMotion ? { opacity: 0 } : { x: "-100%" }}
+              animate={reduceMotion ? { opacity: 1 } : { x: 0 }}
+              exit={reduceMotion ? { opacity: 0 } : { x: "-100%" }}
+              transition={{ duration: reduceMotion ? 0.01 : 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="fixed bottom-0 left-0 top-0 z-[70] w-[86%] max-w-[390px] overflow-y-auto bg-white text-slate-800 shadow-2xl"
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-5">
+                <div><p className="text-xl font-black">Olá! 👋</p><p className="text-sm text-slate-500">Encontre tudo para o seu pet</p></div>
+                <button type="button" onClick={() => setOpen(false)} className="rounded-full bg-slate-100 p-2" aria-label="Fechar menu"><X className="h-5 w-5" /></button>
+              </div>
+              <div className="p-4">
+                <Link href="/" onClick={() => setOpen(false)} className="mb-2 flex items-center gap-3 rounded-2xl px-3 py-3 font-bold hover:bg-emerald-50"><Home className="h-5 w-5 text-emerald-600" /> Início</Link>
+                <p className="px-3 pb-2 pt-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">Categorias</p>
+                {menuItems.map(({ title, href, icon: Icon }) => (
+                  <Link key={title} href={href} onClick={() => setOpen(false)} className="group flex items-center gap-3 rounded-2xl px-3 py-3 hover:bg-emerald-50">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-emerald-700"><Icon className="h-5 w-5" /></span>
+                    <span className="flex-1 font-bold">{title}</span><ChevronRight className="h-5 w-5 text-slate-400" />
+                  </Link>
+                ))}
+                <div className="my-4 border-t border-slate-100" />
+                <Link href="/produtos" onClick={() => setOpen(false)} className="block rounded-2xl px-3 py-3 font-bold hover:bg-slate-50">Todos os produtos</Link>
+                <Link href="/sobre" onClick={() => setOpen(false)} className="block rounded-2xl px-3 py-3 font-bold hover:bg-slate-50">Atendimento e informações</Link>
+              </div>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </nav>
+    </>
   );
 }

@@ -16,7 +16,6 @@ export default function CartSidebar() {
     updateQuantity,
     removeFromCart,
     cartTotal,
-    clearCart,
   } = useCart();
   const reduceMotion = useReducedMotion();
 
@@ -39,9 +38,8 @@ export default function CartSidebar() {
 
     const whatsappUrl = generateWhatsAppLink(WHATSAPP_NUMBER, message);
 
-    clearCart();
-    setIsCartOpen(false);
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    setIsCartOpen(false);
   };
 
   return (
@@ -73,13 +71,13 @@ export default function CartSidebar() {
                 ? { duration: 0.01 }
                 : { type: "spring", stiffness: 320, damping: 32, mass: 0.86 }
             }
-            className="absolute inset-y-3 right-3 flex w-[min(280px,calc(100vw-1.5rem))] sm:inset-y-0 sm:right-0 sm:w-full sm:max-w-md"
+            className="absolute inset-y-0 right-0 flex w-full sm:max-w-md"
           >
-            <div className="flex flex-1 flex-col overflow-hidden rounded-2xl bg-white shadow-2xl sm:rounded-none">
-              <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-100 px-2.5 py-2 sm:px-6 sm:py-4">
+            <div className="flex flex-1 flex-col overflow-hidden bg-white shadow-2xl">
+              <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-100 px-4 py-4 sm:px-6">
                 <h2 className="flex items-center gap-1 text-xs font-black text-slate-800 sm:gap-1.5 sm:text-lg">
                   <HiOutlineShoppingBag className="h-3.5 w-3.5 text-emerald-600 sm:h-5 sm:w-5" />
-                  <span>Carrinho</span>
+                  <span>Meu carrinho</span>
                   {cart.length > 0 && (
                     <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-xs text-emerald-700">
                       {cart.length}
@@ -99,7 +97,7 @@ export default function CartSidebar() {
               </div>
 
               <motion.div
-                className="flex-1 space-y-1.5 overflow-y-auto p-2 sm:space-y-4 sm:p-6"
+                className="flex-1 space-y-3 overflow-y-auto p-4 sm:space-y-4 sm:p-6"
                 initial="hidden"
                 animate="visible"
                 variants={{
@@ -127,9 +125,9 @@ export default function CartSidebar() {
                       }}
                       transition={{ duration: reduceMotion ? 0.01 : 0.28, ease: [0.16, 1, 0.3, 1] }}
                       layout={!reduceMotion}
-                      className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-1.5 sm:rounded-xl sm:p-2"
+                      className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-3"
                     >
-                      <div className="relative h-9 w-9 flex-shrink-0 overflow-hidden rounded-md border border-slate-100 bg-white p-0.5 sm:h-16 sm:w-16 sm:rounded-lg">
+                      <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-slate-100 bg-white p-1">
                         <Image src={item.image_url} alt={item.name} fill className="object-contain p-0.5" />
                       </div>
 
@@ -182,8 +180,9 @@ export default function CartSidebar() {
                   initial={reduceMotion ? false : { opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: reduceMotion ? 0 : 0.12, duration: 0.3 }}
-                  className="flex-shrink-0 space-y-1.5 border-t border-slate-100 bg-white px-2.5 py-2 sm:space-y-2 sm:px-6 sm:py-4"
+                  className="flex-shrink-0 space-y-3 border-t border-slate-100 bg-white px-4 py-4 sm:px-6"
                 >
+                  <p className="text-xs leading-relaxed text-slate-500">Revise os produtos e envie o pedido diretamente para nosso atendimento.</p>
                   <div className="flex items-center justify-between font-bold text-slate-800">
                     <span className="text-[11px] sm:text-sm">Total:</span>
                     <span className="text-sm font-black text-slate-950 sm:text-xl">{formatPrice(cartTotal)}</span>
@@ -194,7 +193,7 @@ export default function CartSidebar() {
                     onClick={handleWhatsAppCheckout}
                     whileHover={reduceMotion ? undefined : { y: -1 }}
                     whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                    className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-2.5 py-1.5 text-[11px] font-bold text-white shadow-sm transition-colors duration-200 hover:bg-[#20ba5a] sm:gap-2 sm:rounded-xl sm:px-3 sm:py-2 sm:text-sm"
+                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-4 py-3 text-sm font-black text-white shadow-md transition-colors duration-200 hover:bg-[#20ba5a]"
                   >
                     <FaWhatsapp className="h-3 w-3 sm:h-4 sm:w-4" />
                     <span>Finalizar no WhatsApp</span>

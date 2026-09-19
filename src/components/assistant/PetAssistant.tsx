@@ -144,20 +144,20 @@ export default function PetAssistant() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 14, scale: 0.98 }}
             transition={{ duration: reduceMotion ? 0.01 : 0.22, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-24 right-3 z-[70] flex h-[min(680px,76vh)] w-[calc(100vw-1.5rem)] max-w-[420px] flex-col overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.22)] sm:bottom-24 sm:right-5"
+            className="fixed bottom-20 left-3 right-3 z-[70] flex h-[min(680px,78vh)] flex-col overflow-hidden rounded-[2rem] border border-emerald-100 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.22)] sm:bottom-24 sm:left-auto sm:right-5 sm:w-[420px]"
             aria-label="Assistente Pet"
           >
-            <header className="flex items-center justify-between border-b border-slate-100 bg-slate-950 px-4 py-3.5 text-white">
+            <header className="flex items-center justify-between border-b border-emerald-500/30 bg-emerald-600 px-4 py-3.5 text-white">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-950/20">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 text-white shadow-lg">
                   <Bot className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
                     <h2 className="text-sm font-black">Assistente Pet</h2>
-                    <Sparkles className="h-3.5 w-3.5 text-emerald-300" aria-hidden="true" />
+                    <Sparkles className="h-3.5 w-3.5 text-orange-300" aria-hidden="true" />
                   </div>
-                  <p className="text-[11px] text-slate-300">Ajuda inteligente para escolher melhor</p>
+                  <p className="text-[11px] text-emerald-50">Ajuda inteligente para escolher melhor</p>
                 </div>
               </div>
 
@@ -373,14 +373,14 @@ export default function PetAssistant() {
         onClick={() => setOpen((current) => !current)}
         whileHover={reduceMotion ? undefined : { y: -2, scale: 1.03 }}
         whileTap={reduceMotion ? undefined : { scale: 0.95 }}
-        className="fixed bottom-4 right-3 z-[70] flex min-h-14 items-center gap-2 rounded-2xl bg-slate-950 px-4 text-sm font-extrabold text-white shadow-[0_18px_45px_rgba(15,23,42,0.30)] transition-colors hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:bottom-5 sm:right-5"
+        className="fixed bottom-4 right-3 z-[70] flex min-h-14 items-center gap-2 rounded-full bg-emerald-600 px-3.5 text-sm font-extrabold text-white shadow-[0_18px_45px_rgba(5,150,105,0.30)] transition-colors hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:bottom-5 sm:right-5 sm:px-4"
         aria-expanded={open}
         aria-label={open ? "Fechar Assistente Pet" : "Abrir Assistente Pet"}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
           {open ? <X className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
         </span>
-        <span className="hidden sm:inline">Assistente Pet</span>
+        <span className="hidden min-[390px]:inline">Assistente Pet IA</span>
       </motion.button>
     </>
   );
