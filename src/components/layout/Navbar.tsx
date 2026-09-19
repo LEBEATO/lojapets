@@ -119,7 +119,7 @@ export default function Navbar() {
             type="button"
             onClick={() => setMobileMenuOpen((open) => !open)}
             whileTap={reduceMotion ? undefined : { scale: 0.92 }}
-            className={`flex items-center gap-1 p-1.5 text-xs font-bold transition-colors md:hidden ${
+            className={`flex items-center gap-1 rounded-xl p-1.5 text-xs font-bold transition-colors md:hidden ${
               isHomeTop ? "text-white" : "text-slate-700 hover:text-emerald-600"
             }`}
             aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"}
