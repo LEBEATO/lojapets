@@ -1,6 +1,35 @@
 "use client";
 import Link from "next/link";
-import { motion,useReducedMotion } from "framer-motion";
-import { ArrowUpRight, Beef, Package, Pill, Shirt, Sparkles, ToyBrick } from "lucide-react";
-const categories=[{title:"Rações",subtitle:"Nutrição para todos os dias",href:"/produtos/categoria/racoes",icon:Package},{title:"Petiscos",subtitle:"Carinho em forma de sabor",href:"/produtos/categoria/petiscos",icon:Beef},{title:"Brinquedos",subtitle:"Diversão e enriquecimento",href:"/produtos/categoria/brinquedos",icon:ToyBrick},{title:"Higiene",subtitle:"Cuidado e bem-estar",href:"/produtos/categoria/higiene",icon:Sparkles},{title:"Acessórios",subtitle:"Conforto para a rotina",href:"/produtos/categoria/acessorios",icon:Shirt},{title:"Medicamentos",subtitle:"Itens para cuidados especiais",href:"/produtos/categoria/medicamentos",icon:Pill}];
-export default function CategoryShowcase(){const r=useReducedMotion();return <motion.section initial={{opacity:0,y:r?0:24}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.15}} transition={{duration:r?.01:.55}} className="mx-auto max-w-7xl px-3 py-10 sm:px-6 sm:py-14 lg:px-8" aria-labelledby="category-heading"><div className="mb-6 flex items-end justify-between gap-4 sm:mb-8"><div><span className="text-xs font-black uppercase tracking-[0.18em] text-emerald-600">Encontre mais rápido</span><h2 id="category-heading" className="mt-2 text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Compre por categoria</h2><p className="mt-2 max-w-xl text-sm leading-relaxed text-slate-500 sm:text-base">Tudo organizado para você chegar ao produto certo em poucos cliques.</p></div><Link href="/produtos" className="hidden text-sm font-bold text-emerald-700 sm:inline-flex">Ver todos</Link></div><div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">{categories.map(({title,subtitle,href,icon:Icon},i)=><motion.div key={title} initial={{opacity:0,y:r?0:22,scale:r?1:.98}} whileInView={{opacity:1,y:0,scale:1}} viewport={{once:true,amount:.25}} transition={{duration:r?.01:.45,delay:r?0:i*.045}}><Link href={href} className="group relative block min-h-40 overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-lg"><div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 transition-transform duration-300 group-hover:scale-105"><Icon className="h-5 w-5"/></div><h3 className="mt-5 text-base font-extrabold tracking-tight text-slate-900">{title}</h3><p className="mt-1 text-xs leading-relaxed text-slate-500">{subtitle}</p><ArrowUpRight className="absolute right-3 top-3 h-4 w-4 text-slate-300 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-600"/></Link></motion.div>)}</div></motion.section>}
+import { motion, useReducedMotion } from "framer-motion";
+import { Beef, Package, Pill, Shirt, Sparkles, ToyBrick } from "lucide-react";
+
+const categories = [
+  { title: "Rações", href: "/produtos/categoria/racoes", icon: Package },
+  { title: "Petiscos", href: "/produtos/categoria/petiscos", icon: Beef },
+  { title: "Brinquedos", href: "/produtos/categoria/brinquedos", icon: ToyBrick },
+  { title: "Higiene", href: "/produtos/categoria/higiene", icon: Sparkles },
+  { title: "Acessórios", href: "/produtos/categoria/acessorios", icon: Shirt },
+  { title: "Medicamentos", href: "/produtos/categoria/medicamentos", icon: Pill },
+];
+
+export default function CategoryShowcase() {
+  const reduceMotion = useReducedMotion();
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8" aria-labelledby="category-heading">
+      <div className="mb-5 flex items-end justify-between">
+        <h2 id="category-heading" className="text-2xl font-black tracking-tight text-slate-950 sm:text-3xl">Categorias</h2>
+        <Link href="/produtos" className="text-sm font-bold text-emerald-700 underline underline-offset-4">Ver todas</Link>
+      </div>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
+        {categories.map(({ title, href, icon: Icon }, index) => (
+          <motion.div key={title} initial={reduceMotion ? false : { opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: reduceMotion ? 0.01 : 0.42, delay: reduceMotion ? 0 : (index % 2) * 0.05 }}>
+            <Link href={href} className="group flex min-h-20 items-center gap-3 rounded-[1.6rem] border border-slate-200 bg-white p-2 pr-3 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-200 hover:shadow-md">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 sm:h-14 sm:w-14"><Icon className="h-7 w-7" /></span>
+              <span className="text-sm font-extrabold text-slate-900 sm:text-base">{title}</span>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
